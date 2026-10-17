@@ -46,7 +46,7 @@ O projeto poderá ser publicado utilizando o GitHub Pages, permitindo o acesso �
 
 O processo de publicação e a automação de CI/CD serão configurados durante as etapas de deploy.
 
-Link da aplicação: a ser adicionado após a publicação.
+Link da aplicação: https://safe-smoky.vercel.app/
 
 Repositório: a ser preenchido com o endereço deste repositório.
 
