@@ -1,0 +1,27 @@
+
+name: Validacao do Projeto
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validar:
+    name: Validar arquivos do projeto
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Verificar arquivos obrigatorios
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f script.js
+          test -f README.md
+          echo "Todos os arquivos obrigatorios foram encontrados."
