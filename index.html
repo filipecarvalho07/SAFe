@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Painel demonstrativo de planejamento SAFe PI Planning.">
+  <title>SAFe PI Planning Board</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">PI</div>
+      <div>
+        <p class="eyebrow">PLANEJAMENTO ÁGIL</p>
+        <h1>SAFe PI Planning Board</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="cycle-pill"><span class="status-dot"></span> PI 2026 · Ciclo 1</span>
+      <button class="button button-primary" id="addFeatureBtn" type="button">＋ Nova funcionalidade</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">VISÃO GERAL</p>
+        <h2>Quadro de planejamento</h2>
+        <p class="muted">Acompanhe o trabalho das equipes, as entregas e as dependências do ciclo.</p>
+      </div>
+      <div class="progress-summary">
+        <div class="progress-label"><span>Progresso geral</span><strong id="progressText">0%</strong></div>
+        <div class="progress-track"><div id="progressBar" class="progress-fill"></div></div>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Resumo do planejamento">
+      <article class="stat-card">
+        <div class="stat-icon icon-blue">♧</div>
+        <div><p class="stat-label">Equipes</p><p class="stat-value" id="teamCount">3</p><p class="stat-note">participando do PI</p></div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon icon-purple">▦</div>
+        <div><p class="stat-label">Funcionalidades</p><p class="stat-value" id="featureCount">6</p><p class="stat-note">itens planejados</p></div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon icon-green">✓</div>
+        <div><p class="stat-label">Concluídas</p><p class="stat-value" id="doneCount">2</p><p class="stat-note">entregas finalizadas</p></div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon icon-orange">⇄</div>
+        <div><p class="stat-label">Dependências</p><p class="stat-value" id="dependencyCount">3</p><p class="stat-note">entre funcionalidades</p></div>
+      </article>
+    </section>
+
+    <section class="section-card">
+      <div class="section-heading">
+        <div>
+          <h3>Funcionalidades por equipe</h3>
+          <p class="muted small">Altere o status de cada item para simular o acompanhamento do PI.</p>
+        </div>
+        <label class="filter-label" for="statusFilter">Filtrar
+          <select id="statusFilter">
+            <option value="all">Todos os status</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Concluído">Concluído</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Funcionalidade</th><th>Equipe</th><th>Prioridade</th><th>Dependência</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="featureTableBody"></tbody>
+        </table>
+      </div>
+      <p class="table-footnote">Os dados são fictícios e servem para demonstrar o funcionamento do painel.</p>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="section-card">
+        <div class="section-heading">
+          <div><h3>Objetivos do PI</h3><p class="muted small">Metas principais deste ciclo.</p></div>
+          <span class="subtle-tag">3 objetivos</span>
+        </div>
+        <ul class="objective-list">
+          <li><span class="objective-check">✓</span><div><strong>Melhorar o acesso</strong><p class="muted small">Permitir login seguro e recuperação de senha.</p></div><span class="objective-status done">Concluído</span></li>
+          <li><span class="objective-check pending">○</span><div><strong>Disponibilizar relatórios</strong><p class="muted small">Exibir indicadores úteis para os usuários.</p></div><span class="objective-status in-progress">Em andamento</span></li>
+          <li><span class="objective-check pending">○</span><div><strong>Integrar serviços</strong><p class="muted small">Conectar a aplicação a uma API externa.</p></div><span class="objective-status waiting">Pendente</span></li>
+        </ul>
+      </article>
+
+      <article class="section-card">
+        <div class="section-heading">
+          <div><h3>Dependências</h3><p class="muted small">Itens que precisam de outra entrega.</p></div>
+          <span class="subtle-tag">Visão rápida</span>
+        </div>
+        <div class="dependency-list">
+          <div class="dependency-item"><div class="dependency-symbol">A → B</div><div><strong>Login → Relatórios</strong><p class="muted small">Equipe B depende da autenticação da Equipe A.</p></div></div>
+          <div class="dependency-item"><div class="dependency-symbol">B → C</div><div><strong>Relatórios → API</strong><p class="muted small">Equipe C precisa dos requisitos de dados definidos.</p></div></div>
+          <div class="dependency-item"><div class="dependency-symbol">A → C</div><div><strong>Login → Integração</strong><p class="muted small">A integração utiliza a autenticação existente.</p></div></div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <span>SAFe PI Planning Board <span class="footer-separator">·</span> Projeto demonstrativo acadêmico</span>
+      <span id="lastUpdated">Dados de exemplo</span>
+    </footer>
+  </main>
+
+  <dialog id="featureDialog">
+    <form id="featureForm" class="dialog-form">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">QUADRO DE PLANEJAMENTO</p><h3>Nova funcionalidade</h3></div>
+        <button class="icon-button" id="closeDialogBtn" type="button" aria-label="Fechar">×</button>
+      </div>
+      <label for="featureName">Nome da funcionalidade</label>
+      <input id="featureName" name="featureName" maxlength="90" placeholder="Ex.: Exportar relatórios" required>
+      <div class="form-row">
+        <div><label for="featureTeam">Equipe</label><select id="featureTeam" name="featureTeam"><option>Equipe A</option><option>Equipe B</option><option>Equipe C</option></select></div>
+        <div><label for="featurePriority">Prioridade</label><select id="featurePriority" name="featurePriority"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>
+      </div>
+      <label for="featureDependency">Dependência</label>
+      <input id="featureDependency" name="featureDependency" maxlength="90" placeholder="Ex.: Login de usuários ou Nenhuma">
+      <label for="featureStatus">Status inicial</label>
+      <select id="featureStatus" name="featureStatus"><option>Pendente</option><option>Em andamento</option><option>Concluído</option></select>
+      <div class="dialog-actions">
+        <button class="button button-secondary" id="cancelDialogBtn" type="button">Cancelar</button>
+        <button class="button button-primary" type="submit">Adicionar funcionalidade</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
