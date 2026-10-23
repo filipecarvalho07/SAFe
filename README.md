@@ -54,6 +54,25 @@ Integração e entrega contínuas (CI/CD)
 
 A proposta do projeto inclui a utilização do GitHub Actions para automatizar etapas do fluxo de publicação, facilitando a atualização da aplicação após alterações no código.
 
+## Melhorias implementadas
+
+- **Busca de funcionalidades:** permite localizar funcionalidades no quadro por texto.
+- **Filtro por status:** facilita a visualização das funcionalidades conforme seu estado.
+- **Persistência local:** utiliza `localStorage` para manter os dados salvos no navegador após atualizar a página.
+
+## Aplicação publicada
+
+Acesse a aplicação pelo Render: https://safe-szo0.onrender.com/
+
+## Tecnologias utilizadas
+
+- HTML
+- CSS
+- JavaScript
+- Git e GitHub
+- Render
+
+
 Objetivo acadêmico
 
 Este projeto tem como objetivo aplicar conceitos de versionamento de código, colaboração, computação em nuvem, deploy e integração e entrega contínuas (CI/CD).
