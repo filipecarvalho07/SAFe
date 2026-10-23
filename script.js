@@ -8,15 +8,42 @@ const initialFeatures = [
   { id: 6, name: "Exportação de dados", team: "Equipe C", priority: "Baixa", dependency: "Integração com API", status: "Pendente" }
 ];
 
-let features = initialFeatures.map(feature => ({ ...feature }));
-let nextId = Math.max(...features.map(feature => feature.id)) + 1;
+const storageKey = "safe-pi-planning-features";
+
+function loadFeatures() {
+  try {
+    const saved = localStorage.getItem(storageKey);
+
+    if (saved !== null) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (error) {
+    console.error("Não foi possível carregar os dados salvos.", error);
+  }
+
+  return initialFeatures.map(feature => ({ ...feature }));
+}
+
+let features = loadFeatures();
+let nextId = Math.max(0, ...features.map(feature => Number(feature.id) || 0)) + 1;
 let toastTimeout;
 
 const tableBody = document.querySelector("#featureTableBody");
 const statusFilter = document.querySelector("#statusFilter");
+const searchInput = document.querySelector("#featureSearch");
 const dialog = document.querySelector("#featureDialog");
 const featureForm = document.querySelector("#featureForm");
 const toast = document.querySelector("#toast");
+
+function saveFeatures() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(features));
+  } catch (error) {
+    console.error("Não foi possível salvar os dados.", error);
+    showToast("Não foi possível salvar os dados neste navegador.");
+  }
+}
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -26,6 +53,14 @@ function escapeHtml(value) {
     '"': "&quot;",
     "'": "&#39;"
   })[char]);
+}
+
+function normalizeText(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function getStatusClass(status) {
@@ -48,16 +83,30 @@ function getTeamClass(team) {
 
 function renderFeatures() {
   const selectedStatus = statusFilter.value;
+  const searchTerm = normalizeText(searchInput ? searchInput.value : "");
 
-  const visibleFeatures = features.filter(feature =>
-    selectedStatus === "all" || feature.status === selectedStatus
-  );
+  const visibleFeatures = features.filter(feature => {
+    const matchesStatus =
+      selectedStatus === "all" || feature.status === selectedStatus;
+
+    const searchableText = normalizeText([
+      feature.name,
+      feature.team,
+      feature.priority,
+      feature.dependency,
+      feature.status
+    ].join(" "));
+
+    const matchesSearch = searchableText.includes(searchTerm);
+
+    return matchesStatus && matchesSearch;
+  });
 
   if (visibleFeatures.length === 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="6" class="empty-state">
-          Nenhuma funcionalidade encontrada para este filtro.
+          Nenhuma funcionalidade encontrada.
         </td>
       </tr>
     `;
@@ -87,7 +136,7 @@ function renderFeatures() {
             aria-label="Status de ${escapeHtml(feature.name)}"
           >
             ${["Pendente", "Em andamento", "Concluído"].map(status =>
-              `<option${feature.status === status ? " selected" : ""}>${status}</option>`
+              `<option value="${status}"${feature.status === status ? " selected" : ""}>${status}</option>`
             ).join("")}
           </select>
         </td>
@@ -113,8 +162,8 @@ function updateSummary() {
   const teams = new Set(features.map(feature => feature.team)).size;
 
   const dependencies = features.filter(feature =>
-    feature.dependency.trim() !== "" &&
-    feature.dependency.toLowerCase() !== "nenhuma"
+    String(feature.dependency || "").trim() !== "" &&
+    normalizeText(feature.dependency) !== "nenhuma"
   ).length;
 
   document.querySelector("#teamCount").textContent = teams;
@@ -123,16 +172,22 @@ function updateSummary() {
   document.querySelector("#dependencyCount").textContent = dependencies;
   document.querySelector("#progressText").textContent = `${percent}%`;
   document.querySelector("#progressBar").style.width = `${percent}%`;
+
+  const lastUpdated = document.querySelector("#lastUpdated");
+
+  if (lastUpdated) {
+    lastUpdated.textContent = `Última atualização: ${new Date().toLocaleString("pt-BR")}`;
+  }
 }
 
 function showToast(message) {
   toast.textContent = message;
-  toast.classList.add("visible");
+  toast.classList.add("show");
 
   window.clearTimeout(toastTimeout);
 
   toastTimeout = window.setTimeout(() => {
-    toast.classList.remove("visible");
+    toast.classList.remove("show");
   }, 2800);
 }
 
@@ -158,28 +213,37 @@ featureForm.addEventListener("submit", event => {
 
   const formData = new FormData(featureForm);
   const name = String(formData.get("featureName") || "").trim();
+  const team = String(formData.get("featureTeam") || "").trim();
 
-  if (!name) {
-    showToast("Digite o nome da funcionalidade.");
+  if (!name || !team) {
+    showToast("Preencha o nome e a equipe responsável.");
     return;
   }
 
   features.push({
     id: nextId++,
     name,
-    team: String(formData.get("featureTeam")),
+    team,
     priority: String(formData.get("featurePriority")),
     dependency: String(formData.get("featureDependency") || "").trim() || "Nenhuma",
     status: String(formData.get("featureStatus"))
   });
 
+  saveFeatures();
   statusFilter.value = "all";
+
+  if (searchInput) searchInput.value = "";
+
   renderFeatures();
   closeDialog();
   showToast("Funcionalidade adicionada ao quadro.");
 });
 
 statusFilter.addEventListener("change", renderFeatures);
+
+if (searchInput) {
+  searchInput.addEventListener("input", renderFeatures);
+}
 
 tableBody.addEventListener("change", event => {
   const select = event.target.closest("[data-status-id]");
@@ -192,6 +256,7 @@ tableBody.addEventListener("change", event => {
   if (!feature) return;
 
   feature.status = select.value;
+  saveFeatures();
   renderFeatures();
   showToast(`Status atualizado: ${feature.name}.`);
 });
@@ -213,6 +278,7 @@ tableBody.addEventListener("click", event => {
   if (!confirmed) return;
 
   features = features.filter(item => item.id !== feature.id);
+  saveFeatures();
   renderFeatures();
   showToast("Funcionalidade removida.");
 });
