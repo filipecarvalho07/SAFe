@@ -60,6 +60,10 @@ A proposta do projeto inclui a utilização do GitHub Actions para automatizar e
 - **Filtro por status:** facilita a visualização das funcionalidades conforme seu estado.
 - **Persistência local:** utiliza `localStorage` para manter os dados salvos no navegador após atualizar a página.
 
+## Documentação de requisitos
+
+A [ERS do SAFe PI Planning Board](docs/ERS-SAFe-PI-Planning-Board.docx) descreve o escopo, os requisitos funcionais e não funcionais, as interfaces e as restrições do painel. O documento também inclui critérios de verificação e um roteiro de demonstração.
+
 ## Aplicação publicada
 
 Acesse a aplicação pelo Render: https://safe-szo0.onrender.com/
